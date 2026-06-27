@@ -1,17 +1,40 @@
-# SignBridge
+# Bhasha
 
-A real-time accessibility platform that converts sign language into speech and speech into sign language.
+## AI-Powered Sign Language Communication Platform
+
+### Problem Statement
+
+Bhasha is an accessibility platform designed to bridge communication between sign language users and spoken language users using Artificial Intelligence and Computer Vision.
+
+---
 
 ## Features
 
-- Sign → Text
+- Sign Language → Text
 - Text → Speech
 - Speech → Text
-- Text → Sign Animation
+- Speech → Sign Language
+- Real-time Camera Detection
+
+---
 
 ## Tech Stack
 
+### Frontend
 - React
+- Vite
+- CSS
+
+### Backend
 - Node.js
+- Express
+
+### AI
 - MediaPipe
-- MongoDB
+- TensorFlow (later)
+
+---
+
+## Status
+
+🚧 Under Development
