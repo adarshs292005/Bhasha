@@ -1,7 +1,7 @@
-import Home from "./pages/Home";
+import Translator from "./pages/Translator";
 
 function App() {
-  return <Home />;
+  return <Translator />;
 }
 
 export default App;
