@@ -2,19 +2,54 @@ import { useEffect, useRef } from "react";
 import Webcam from "react-webcam";
 import { createHandTracker } from "../ai/handTracker";
 
+
 function Translator() {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
 
   useEffect(() => {
+    let handTracker;
+
     async function initializeAI() {
       console.log("Loading AI...");
 
-      const handTracker = await createHandTracker();
+      handTracker = await createHandTracker();
 
       console.log("AI Loaded Successfully!");
 
-      console.log(handTracker);
+      detectHands();
+    }
+
+    async function detectHands() {
+      if (
+        !webcamRef.current ||
+        !webcamRef.current.video ||
+        webcamRef.current.video.readyState !== 4
+      ) {
+        requestAnimationFrame(detectHands);
+        return;
+      }
+
+      const video = webcamRef.current.video;
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      const results = handTracker.detectForVideo(
+        video,
+        performance.now()
+      );
+      if (results.landmarks.length>0) {
+        console.log("Hand detected!");
+      }
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      
+
+      requestAnimationFrame(detectHands);
     }
 
     initializeAI();
