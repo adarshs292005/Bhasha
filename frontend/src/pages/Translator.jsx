@@ -1,11 +1,15 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { createHandTracker } from "../ai/handTracker";
-
+import useHandTracking from "../hooks/useHandTracking";
+import { recognizeGesture } from "../utils/gestureRecognition";
 
 function Translator() {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
+  const { isLoading } = useHandTracking();
+  console.log("isLoading=", isLoading);
+  const [gesture, setGesture] = useState("Waiting...");
 
   useEffect(() => {
     let handTracker;
@@ -42,7 +46,10 @@ function Translator() {
         performance.now()
       );
       if (results.landmarks.length>0) {
-        console.log("Hand detected!");
+       const detectedGesture = recognizeGesture(results.landmarks[0]);
+       setGesture(detectedGesture);
+
+       console.log(detectedGesture);
       }
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -61,7 +68,11 @@ function Translator() {
       <h1 className="text-4xl font-bold mb-8">
         Bhasha AI Translator
       </h1>
-
+      {isLoading && (
+       <p className="text-green-400 mb-4">
+         Initializing AI...
+       </p>
+      )}
       <div className="relative">
 
         <Webcam
@@ -70,6 +81,14 @@ function Translator() {
           mirrored={true}
           className="rounded-xl border-4 border-indigo-500"
         />
+        <div className="mt-8 text-center">
+
+         <h2 className="text-3xl font-bold text-indigo-400">
+          {gesture}
+          
+         </h2>
+
+        </div>
 
         <canvas
           ref={canvasRef}
