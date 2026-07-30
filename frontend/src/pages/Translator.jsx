@@ -3,6 +3,9 @@ import Webcam from "react-webcam";
 import { createHandTracker } from "../ai/handTracker";
 import useHandTracking from "../hooks/useHandTracking";
 import { recognizeGesture } from "../utils/gestureRecognition";
+import { extractFeatures} from "../ai/featureExtractor";
+import { addSample } from "../ai/datasetCollector";
+import { downloadDataset } from "../services/datasetService";
 
 function Translator() {
   const webcamRef = useRef(null);
@@ -10,6 +13,7 @@ function Translator() {
   const { isLoading } = useHandTracking();
   console.log("isLoading=", isLoading);
   const [gesture, setGesture] = useState("Waiting...");
+  const [currentFeatures, setCurrentFeatures] = useState([]);
 
   useEffect(() => {
     let handTracker;
@@ -47,6 +51,14 @@ function Translator() {
       );
       if (results.landmarks.length>0) {
        const detectedGesture = recognizeGesture(results.landmarks[0]);
+       const features = extractFeatures(results.landmarks[0]);
+       setCurrentFeatures(features);
+       if (gesture === "HELLO 👋") {
+       addSample(features, "HELLO");
+       }
+
+       console.log(features);
+       console.log("Feature Vector Length:", features.length);
        setGesture(detectedGesture);
 
        console.log(detectedGesture);
@@ -61,6 +73,27 @@ function Translator() {
 
     initializeAI();
   }, []);
+  useEffect(() => {
+  const handleKeyDown = (event) => {
+    const key = event.key.toLowerCase();
+
+    if (key === "h") {
+     if (currentFeatures.length === 63) {
+        addSample(currentFeatures, "HELLO");
+       }
+     }
+
+     if (key === "d") {
+       downloadDataset();
+     }
+   };
+
+   window.addEventListener("keydown", handleKeyDown);
+
+   return () => {
+    window.removeEventListener("keydown", handleKeyDown);
+   };
+  }, [currentFeatures]);
 
   return (
     <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center text-white p-10">
