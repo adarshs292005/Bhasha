@@ -6,6 +6,7 @@ import { recognizeGesture } from "../utils/gestureRecognition";
 import { extractFeatures} from "../ai/featureExtractor";
 import { addSample } from "../ai/datasetCollector";
 import { downloadDataset } from "../services/datasetService";
+import { uploadSample } from "../services/uploadSample";
 
 function Translator() {
   const webcamRef = useRef(null);
@@ -14,6 +15,8 @@ function Translator() {
   console.log("isLoading=", isLoading);
   const [gesture, setGesture] = useState("Waiting...");
   const [currentFeatures, setCurrentFeatures] = useState([]);
+  const [selectedGesture, setSelectedGesture] = useState("A");
+  console.log(import.meta.env.VITE_SUPABASE_URL);
 
   useEffect(() => {
     let handTracker;
@@ -74,7 +77,7 @@ function Translator() {
     initializeAI();
   }, []);
   useEffect(() => {
-  const handleKeyDown = (event) => {
+  const handleKeyDown = async(event) => {
     const key = event.key.toLowerCase();
 
     if (key === "h") {
@@ -106,6 +109,29 @@ function Translator() {
          Initializing AI...
        </p>
       )}
+      <div className="mb-4">
+      <label className="mr-2 font-semibold">
+        Gesture:
+      </label>
+
+      <select
+        value={selectedGesture}
+        onChange={(e) => setSelectedGesture(e.target.value)}
+        className="bg-gray-800 text-white p-2 rounded border border-gray-600"
+      >
+        {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map(letter => (
+          <option key={letter} value={letter}>
+            {letter}
+          </option>
+        ))}
+
+        <option value="HELLO">HELLO</option>
+        <option value="THANK_YOU">THANK YOU</option>
+        <option value="YES">YES</option>
+        <option value="NO">NO</option>
+       </select>
+      </div>
+
       <div className="relative">
 
         <Webcam
@@ -114,6 +140,21 @@ function Translator() {
           mirrored={true}
           className="rounded-xl border-4 border-indigo-500"
         />
+        <button
+  onClick={async () => {
+    if (currentFeatures.length !== 63) {
+      alert("❌ Hand not detected");
+      return;
+    }
+
+    await uploadSample(selectedGesture, currentFeatures);
+
+    alert("✅ Sample Uploaded");
+  }}
+  className="mt-6 bg-indigo-600 hover:bg-indigo-700 px-6 py-3 rounded-lg"
+>
+  Record Sample
+</button>
         <div className="mt-8 text-center">
 
          <h2 className="text-3xl font-bold text-indigo-400">
