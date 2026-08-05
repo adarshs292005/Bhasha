@@ -7,6 +7,7 @@ import { extractFeatures} from "../ai/featureExtractor";
 import { addSample } from "../ai/datasetCollector";
 import { downloadDataset } from "../services/datasetService";
 import { uploadSample } from "../services/uploadSample";
+import gestureImages from "../data/gestureImages";
 
 function Translator() {
   const webcamRef = useRef(null);
@@ -16,7 +17,9 @@ function Translator() {
   const [gesture, setGesture] = useState("Waiting...");
   const [currentFeatures, setCurrentFeatures] = useState([]);
   const [selectedGesture, setSelectedGesture] = useState("A");
+  const [participant, setParticipant] = useState("");
   console.log(import.meta.env.VITE_SUPABASE_URL);
+
 
   useEffect(() => {
     let handTracker;
@@ -109,10 +112,18 @@ function Translator() {
          Initializing AI...
        </p>
       )}
+      <input
+  type="text"
+  placeholder="Participant Name"
+  value={participant}
+  onChange={(e) => setParticipant(e.target.value)}
+  className="bg-gray-800 text-white p-2 rounded border border-gray-600 mb-4 w-64"
+/>
       <div className="mb-4">
       <label className="mr-2 font-semibold">
         Gesture:
       </label>
+
 
       <select
         value={selectedGesture}
@@ -131,6 +142,11 @@ function Translator() {
         <option value="NO">NO</option>
        </select>
       </div>
+      <img
+  src={gestureImages[selectedGesture]}
+  alt={selectedGesture}
+  className="w-56 rounded-lg border-2 border-indigo-500"
+/>
 
       <div className="relative">
 
